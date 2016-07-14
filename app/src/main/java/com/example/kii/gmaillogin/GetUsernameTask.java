@@ -34,7 +34,7 @@ public class GetUsernameTask extends AsyncTask {
         Account maccount;
         private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         private static final JsonFactory JSON_FACTORY = new JacksonFactory();
-        static final String client_id = "556216215455-en2cq3o97lhalrmsarjris34oqrgetbv.apps.googleusercontent.com";
+        static final String client_id = "server:client_id:" + "556216215455-en2cq3o97lhalrmsarjris34oqrgetbv.apps.googleusercontent.com";
         static final String client_secret = "ofJIVGt4D3yuVuHutrrWLkSr";
 
 
@@ -64,15 +64,17 @@ public class GetUsernameTask extends AsyncTask {
 
 
 
-//                GoogleCredential credential = new GoogleCredential.Builder()
-//                        .setTransport(Auth.HTTP_TRANSPORT).setJsonFactory(Auth.JSON_FACTORY)
-//                        .setClientSecrets(client_id, client_secret).setRequestInitializer((new HttpRequestInitializer(){
-//                            @Override
-//                            public void initialize(HttpRequest request)
-//                                    throws IOException {
-//                                request.getHeaders().put("Authorization", "Bearer " + token);
-//                            }
-//                        })).build();
+                GoogleCredential credential = new GoogleCredential.Builder()
+                        .setTransport(Auth.HTTP_TRANSPORT).setJsonFactory(Auth.JSON_FACTORY)
+                        .setClientSecrets(client_id, client_secret).setRequestInitializer((new HttpRequestInitializer(){
+                            @Override
+                            public void initialize(HttpRequest request)
+                                    throws IOException {
+                                request.getHeaders().put("Authorization", "Bearer " + token);
+                            }
+                        })).build();
+                                credential.setAccessToken(token);
+
 
 
 
@@ -82,10 +84,12 @@ public class GetUsernameTask extends AsyncTask {
 //                        mActivity, Arrays.asList(mScope))
 //                        .setSelectedAccountName(maccount.name);
 //                //===============
-//
-//
-//                UploadVideo.uploadIt(credential, mActivity.getApplicationContext());
 
+//               GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
+//                mActivity, client_id)
+//                .setSelectedAccountName(maccount.name);
+
+                UploadVideo.uploadIt(credential, mActivity.getApplicationContext());
 
 
 

@@ -83,7 +83,7 @@ public class UploadVideo {
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
 
-    public static void uploadIt(GoogleAccountCredential credential, Context context){
+    public static void uploadIt(Credential credential, Context context){
 //        // This OAuth 2.0 access scope allows an application to upload files
         // to the authenticated user's YouTube channel, but doesn't allow
         // other types of access.
@@ -194,6 +194,7 @@ public class UploadVideo {
             // Call the API and upload the video.
             Video returnedVideo = videoInsert.execute();
 
+
 //            // Print data about the newly inserted video from the API response.
 //            System.out.println("\n================== Returned Video ==================\n");
 //            System.out.println("  - Id: " + returnedVideo.getId());
@@ -201,7 +202,9 @@ public class UploadVideo {
 //            System.out.println("  - Tags: " + returnedVideo.getSnippet().getTags());
 //            System.out.println("  - Privacy Status: " + returnedVideo.getStatus().getPrivacyStatus());
 //            System.out.println("  - Video Count: " + returnedVideo.getStatistics().getViewCount());
-            Log.d("hello", "done?");
+            Log.d("returnedVideo.id", returnedVideo.getId());
+            Log.d("returnedVideo.getPro", returnedVideo.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
