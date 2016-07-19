@@ -21,9 +21,20 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -83,7 +94,7 @@ public class UploadVideo {
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
 
-    public static void uploadIt(Credential credential, Context context){
+    public static void uploadIt(Credential credential, Context context, InputStream finalStream){
 //        // This OAuth 2.0 access scope allows an application to upload files
         // to the authenticated user's YouTube channel, but doesn't allow
         // other types of access.
@@ -139,7 +150,8 @@ public class UploadVideo {
 
             // Add the completed snippet object to the video resource.
           videoObjectDefiningMetadata.setSnippet(snippet);
-          InputStream is = context.getAssets().open("Sample1mb.mp4");
+          InputStream is = finalStream;
+//            Log.i("is", is.toString());
 
 
 
@@ -205,9 +217,51 @@ public class UploadVideo {
             Log.d("returnedVideo.id", returnedVideo.getId());
             Log.d("returnedVideo.getPro", returnedVideo.toString());
 
+
+
+            checkAPI(returnedVideo.getId());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public static void checkAPI(String id) throws IOException, JSONException {
+
+        String url = "http://10.0.1.8:8080/api/youtube-tester";
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//
+
+        //add reuqest header
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        String urlParameters = "url=" + id;
+
+        // Send post request
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(urlParameters);
+        wr.flush();
+        wr.close();
+
+        int responseCode = con.getResponseCode();
+
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        Log.d("a", response.toString());
+
+    }
 }

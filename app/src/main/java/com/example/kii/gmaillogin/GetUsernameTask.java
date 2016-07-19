@@ -21,6 +21,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -32,16 +33,18 @@ public class GetUsernameTask extends AsyncTask {
         Activity mActivity;
         String mScope;
         Account maccount;
+        InputStream finalStream;
         private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         private static final JsonFactory JSON_FACTORY = new JacksonFactory();
         static final String client_id = "server:client_id:" + "556216215455-en2cq3o97lhalrmsarjris34oqrgetbv.apps.googleusercontent.com";
         static final String client_secret = "ofJIVGt4D3yuVuHutrrWLkSr";
 
 
-        GetUsernameTask(Activity activity, Account account, String scope){
+        GetUsernameTask(Activity activity, Account account, String scope, InputStream finalStream){
         this.mActivity=activity;
         this.mScope=scope;
         this.maccount=account;
+        this.finalStream = finalStream;
         }
 
     @Override
@@ -89,27 +92,7 @@ public class GetUsernameTask extends AsyncTask {
 //                mActivity, client_id)
 //                .setSelectedAccountName(maccount.name);
 
-                UploadVideo.uploadIt(credential, mActivity.getApplicationContext());
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                UploadVideo.uploadIt(credential, mActivity.getApplicationContext(), finalStream);
             }
             else{
                 Log.d("abc", "abc");

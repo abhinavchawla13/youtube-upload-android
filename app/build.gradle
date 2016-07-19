@@ -22,6 +22,9 @@ android {
 repositories {
     mavenCentral()
     mavenLocal()  // For google-play-services is not on Maven Central.
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 dependencies {
@@ -37,4 +40,6 @@ dependencies {
     compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.11.0-beta'
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile files('libs/mail.jar')
+//    compile 'org.springframework.android:spring-android-rest-template:2.0.0.M3'
+
 }

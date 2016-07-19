@@ -4,12 +4,15 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,13 +31,31 @@ import android.Manifest;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -51,10 +72,13 @@ public class LoginActivity extends Activity {
     private VideoView imgView;
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     static final int CAM_REQ = 1;
+    public InputStream finalStream;
+
 
 
     //Send button
     private Button buttonSend;
+    private Button createVideo;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -62,12 +86,27 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //network
+
+        int SDK_INT = android.os.Build.VERSION.SDK_INT;
+        if (SDK_INT > 8)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            //your codes here
+
+        }
+
+
+
         //Initializing the views
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextSubject = (EditText) findViewById(R.id.editTextSubject);
         editTextMessage = (EditText) findViewById(R.id.editTextMessage);
         camButton = (Button) findViewById(R.id.rVideoButton);
         imgView = (VideoView) findViewById(R.id.imgView);
+        createVideo = (Button) findViewById(R.id.createVideoButton);
 
         buttonSend = (Button) findViewById(R.id.buttonSend);
         requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 3423);
@@ -105,9 +144,34 @@ public class LoginActivity extends Activity {
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendEmail();
+                try {
+                    checkAPI();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
+
+        //Adding click listener
+        createVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+                    File file = getFile();
+//                    takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                    startActivityForResult(takeVideoIntent, CAM_REQ);
+                }
+
+//                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+//                startActivityForResult(takeVideoIntent, CAM_REQ);
+            }
+        });
+
 
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +218,6 @@ public class LoginActivity extends Activity {
         String[] accountTypes = new String[]{"com.google"};
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
                 accountTypes, false, null, null, null, null);
-        Log.d("ABC", "ABC");
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
@@ -166,11 +229,11 @@ public class LoginActivity extends Activity {
 //    }
 
     private File getFile(){
-        File folder = new File("sdcard/camera_app");
+        File folder = new File(this.getFilesDir(), "youtube_app");
         if(!folder.exists()){
             folder.mkdir();
         }
-        File vod_file = new File(folder, "cam_vod.mp4");
+        File vod_file = new File(folder, "123456.mp4");
         return vod_file;
     }
 
@@ -182,7 +245,6 @@ public class LoginActivity extends Activity {
 
         //Creating SendMail object
         SendMail sm = new SendMail(this, email, subject, message);
-
         //Executing sendmail to send email
         sm.execute();
     }
@@ -190,9 +252,38 @@ public class LoginActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == CAM_REQ) {
-            String path = "sdcard/camera_app/cam_vod.mp4";
-            imgView.setVideoPath(path);
+//            String path = "sdcard/camea_app/cam_vod.mp4";
+//            imgView.setVideoPath(path);
+//            imgView.start();
+
+            Uri videoUri = data.getData();
+            try {
+                finalStream = getContentResolver().openInputStream(videoUri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.d("hello", "here");
+            }
+            imgView.setVideoURI(videoUri);
             imgView.start();
+//            Log.d("uriPath", videoUri.getPath());
+//            Log.d("Hello", "h");
+//
+//            URL url = null;
+//            String path = getRealPathFromURI(this, videoUri);
+//
+//            try {
+//                url = new File(path).toURI().toURL();
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            }
+////
+//            try {
+//                finalStream = url.openStream();
+//                Log.i("Yeyeye", finalStream.toString());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            Log.i("URLf", url.toString());
         }
         else if(requestCode == REQUEST_CODE_PICK_ACCOUNT){
             // Receiving a result from the AccountPicker
@@ -215,6 +306,21 @@ public class LoginActivity extends Activity {
         }
     }
 
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 //    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
     String SCOPE = "oauth2:https://www.googleapis.com/auth/youtube.upload";
 
@@ -228,7 +334,8 @@ public class LoginActivity extends Activity {
             pickUserAccount();
         } else {
 //            if (isDeviceOnline()) {
-                new GetUsernameTask(LoginActivity.this, account, SCOPE).execute();
+            Log.i("BeforeGetUserNameTask", finalStream.toString());
+                new GetUsernameTask(LoginActivity.this, account, SCOPE, finalStream).execute();
 //            } else {
 //                Toast.makeText(this, R.string.not_online, Toast.LENGTH_LONG).show();
 //            }
@@ -263,5 +370,44 @@ public class LoginActivity extends Activity {
 //        File file = new File(getFilesDir(), "dataStore");
 //        return file;
 //    }
+
+    public void checkAPI() throws IOException, JSONException {
+
+        String url = "http://10.0.1.8:8080/api/youtube-tester";
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//
+
+        //add reuqest header
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        String urlParameters = "url=12345678";
+
+        // Send post request
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(urlParameters);
+        wr.flush();
+        wr.close();
+
+        int responseCode = con.getResponseCode();
+
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        Log.d("a", response.toString());
+
+    }
 }
 
