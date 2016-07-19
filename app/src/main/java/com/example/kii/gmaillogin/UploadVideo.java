@@ -2,11 +2,16 @@ package com.example.kii.gmaillogin;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.vision.text.Text;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -20,6 +25,7 @@ import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
+import com.google.common.math.DoubleMath;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +41,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -94,7 +101,7 @@ public class UploadVideo {
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
 
-    public static void uploadIt(Credential credential, Context context, InputStream finalStream){
+    public static void uploadIt(Credential credential, final Context context, InputStream finalStream){
 //        // This OAuth 2.0 access scope allows an application to upload files
         // to the authenticated user's YouTube channel, but doesn't allow
         // other types of access.
@@ -157,6 +164,7 @@ public class UploadVideo {
 
             InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,
                     is);
+            final double total = (double) is.available();
 
             // Insert the video. The command sends three arguments. The first
             // specifies which information the API request is setting and which
@@ -190,10 +198,35 @@ public class UploadVideo {
                             break;
                         case MEDIA_IN_PROGRESS:
                             System.out.println("Upload in progress");
-                            System.out.println("Upload percentage: " + uploader.getProgress());
+                            final double progressPerc = ((double) (uploader.getNumBytesUploaded())/total)*100;
+                            final DecimalFormat df = new DecimalFormat("#.#");
+
+
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                public void run() {
+                                    // code goes here
+                                    LoginActivity.progress.setText(df.format(progressPerc) + "%");
+
+                                }
+                            });
+
+//                            LoginActivity.runTestOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                }
+//                            });
+//
+                            System.out.println("Upload percentage: " + progressPerc + "%");
                             break;
                         case MEDIA_COMPLETE:
                             System.out.println("Upload Completed!");
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                public void run() {
+                                    // code goes here
+                                    LoginActivity.progress.setText("100%");
+
+                                }
+                            });
                             break;
                         case NOT_STARTED:
                             System.out.println("Upload Not Started!");
@@ -264,4 +297,5 @@ public class UploadVideo {
         Log.d("a", response.toString());
 
     }
+
 }

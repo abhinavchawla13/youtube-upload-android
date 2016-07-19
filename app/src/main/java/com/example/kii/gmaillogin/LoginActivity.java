@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.Manifest;
@@ -46,6 +48,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -73,12 +76,15 @@ public class LoginActivity extends Activity {
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     static final int CAM_REQ = 1;
     public InputStream finalStream;
+    public static TextView progress;
 
 
 
     //Send button
     private Button buttonSend;
     private Button createVideo;
+
+
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -110,6 +116,9 @@ public class LoginActivity extends Activity {
 
         buttonSend = (Button) findViewById(R.id.buttonSend);
         requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 3423);
+
+
+        progress = (TextView) findViewById(R.id.progressTV);
 //
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -160,12 +169,15 @@ public class LoginActivity extends Activity {
         createVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                File mediaFile =
+                        new File(LoginActivity.this.getFilesDir().getAbsolutePath()
+                                + "/myvideo.mp4");
                 Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                    File file = getFile();
-//                    takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-                    startActivityForResult(takeVideoIntent, CAM_REQ);
-                }
+                File file = getFile();
+                Uri videoUri = Uri.fromFile(mediaFile);
+//              takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+                startActivityForResult(takeVideoIntent, CAM_REQ);
+
 
 //                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
 //                startActivityForResult(takeVideoIntent, CAM_REQ);
@@ -252,10 +264,6 @@ public class LoginActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == CAM_REQ) {
-//            String path = "sdcard/camea_app/cam_vod.mp4";
-//            imgView.setVideoPath(path);
-//            imgView.start();
-
             Uri videoUri = data.getData();
             try {
                 finalStream = getContentResolver().openInputStream(videoUri);
@@ -265,25 +273,23 @@ public class LoginActivity extends Activity {
             }
             imgView.setVideoURI(videoUri);
             imgView.start();
-//            Log.d("uriPath", videoUri.getPath());
-//            Log.d("Hello", "h");
-//
-//            URL url = null;
-//            String path = getRealPathFromURI(this, videoUri);
-//
-//            try {
-//                url = new File(path).toURI().toURL();
-//            } catch (MalformedURLException e) {
-//                e.printStackTrace();
+
+//            Cursor videoCursor =
+//                    getContentResolver().query(videoUri, null, null, null, null);
+//            int sizeIndex = videoCursor.getColumnIndex(OpenableColumns.SIZE);
+//            videoCursor.moveToFirst();
+//            progress.setText(Long.toString(videoCursor.getLong(sizeIndex)));
+
+//            if (resultCode == RESULT_OK) {
+//                Toast.makeText(this, "Video saved to:\n" +
+//                        data.getData(), Toast.LENGTH_LONG).show();
+//            } else if (resultCode == RESULT_CANCELED) {
+//                Toast.makeText(this, "Video recording cancelled.",
+//                        Toast.LENGTH_LONG).show();
+//            } else {
+//                Toast.makeText(this, "Failed to record video",
+//                        Toast.LENGTH_LONG).show();
 //            }
-////
-//            try {
-//                finalStream = url.openStream();
-//                Log.i("Yeyeye", finalStream.toString());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            Log.i("URLf", url.toString());
         }
         else if(requestCode == REQUEST_CODE_PICK_ACCOUNT){
             // Receiving a result from the AccountPicker
@@ -303,21 +309,6 @@ public class LoginActivity extends Activity {
 
             // Handle the result from exceptions
 //        ...
-        }
-    }
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
@@ -342,29 +333,7 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public InputStream loadJSONFromAsset() {
-        String json = null;
-        InputStream is;
-        try {
-             is = getAssets().open("client_secrets.json");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return is;
 
-    }
-
-    public InputStream getVideoStream() {
-        InputStream is;
-        try {
-            is = getAssets().open("Sample1mb.mp4");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return is;
-    }
 
 //    public File createNewFile(){
 //        File file = new File(getFilesDir(), "dataStore");
@@ -409,5 +378,15 @@ public class LoginActivity extends Activity {
         Log.d("a", response.toString());
 
     }
+
+    public void setText(final Double value){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.setText(Double.toString(value));
+            }
+        });
+    }
+
 }
 
