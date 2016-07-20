@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -68,15 +69,16 @@ public class LoginActivity extends Activity {
      * Id to identity READ_CONTACTS permission request.
      */
     //Declaring EditText
-    private EditText editTextEmail;
-    private EditText editTextSubject;
-    private EditText editTextMessage;
+    public static EditText editTextEmail;
+    public static EditText editTextSubject;
+    public static EditText editTextMessage;
     private Button camButton;
     private VideoView imgView;
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     static final int CAM_REQ = 1;
     public InputStream finalStream;
     public static TextView progress;
+    public static ProgressDialog progressDialog;
 
 
 
@@ -114,11 +116,14 @@ public class LoginActivity extends Activity {
         imgView = (VideoView) findViewById(R.id.imgView);
         createVideo = (Button) findViewById(R.id.createVideoButton);
 
-        buttonSend = (Button) findViewById(R.id.buttonSend);
+//        buttonSend = (Button) findViewById(R.id.buttonSend);
         requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 3423);
 
 
         progress = (TextView) findViewById(R.id.progressTV);
+        progressDialog = new ProgressDialog(this);
+
+
 //
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -149,21 +154,21 @@ public class LoginActivity extends Activity {
 
 
 
-        //Adding click listener
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    checkAPI();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        //Adding click listener
+//        buttonSend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    checkAPI();
+//                } catch (MalformedURLException e) {
+//                    e.printStackTrace();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         //Adding click listener
         createVideo.setOnClickListener(new View.OnClickListener() {
@@ -327,6 +332,13 @@ public class LoginActivity extends Activity {
 //            if (isDeviceOnline()) {
             Log.i("BeforeGetUserNameTask", finalStream.toString());
                 new GetUsernameTask(LoginActivity.this, account, SCOPE, finalStream).execute();
+                progressDialog.setMessage("Uploading Video");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setIndeterminate(false);
+                progressDialog.setProgress(0);
+                progressDialog.setMax(100);
+                progressDialog.show();
+
 //            } else {
 //                Toast.makeText(this, R.string.not_online, Toast.LENGTH_LONG).show();
 //            }

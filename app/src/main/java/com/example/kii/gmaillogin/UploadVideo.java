@@ -205,7 +205,8 @@ public class UploadVideo {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 public void run() {
                                     // code goes here
-                                    LoginActivity.progress.setText(df.format(progressPerc) + "%");
+//                                    LoginActivity.progress.setText(df.format(progressPerc) + "%");
+                                    LoginActivity.progressDialog.setProgress((int) Math.ceil(progressPerc));
 
                                 }
                             });
@@ -223,8 +224,9 @@ public class UploadVideo {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 public void run() {
                                     // code goes here
-                                    LoginActivity.progress.setText("100%");
-
+                                    LoginActivity.progress.setText("Upload finished! Sit back, and relax while email is being sent.");
+                                    LoginActivity.progressDialog.setProgress(100);
+                                    LoginActivity.progressDialog.dismiss();
                                 }
                             });
                             break;
@@ -271,7 +273,9 @@ public class UploadVideo {
         con.setRequestMethod("POST");
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        String urlParameters = "url=" + id;
+        String urlParameters = "url=" + id + "&email=" + LoginActivity.editTextEmail.getText() +
+                "&subject=" + LoginActivity.editTextSubject.getText() +
+                "&message=" + LoginActivity.editTextMessage.getText();
 
         // Send post request
         con.setDoOutput(true);

@@ -37,7 +37,7 @@ public class GetUsernameTask extends AsyncTask {
         private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         private static final JsonFactory JSON_FACTORY = new JacksonFactory();
         static final String client_id = "server:client_id:" + "556216215455-en2cq3o97lhalrmsarjris34oqrgetbv.apps.googleusercontent.com";
-        static final String client_secret = "ofJIVGt4D3yuVuHutrrWLkSr";
+        static final String client_secret = "xDOpU5yKBYz5LIOxi_kzw5X9";
 
 
         GetUsernameTask(Activity activity, Account account, String scope, InputStream finalStream){
