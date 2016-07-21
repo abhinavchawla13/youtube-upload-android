@@ -4,7 +4,8 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:weightSum="1">
 
     <TextView
         android:text="Recipient Email"
@@ -54,10 +55,19 @@
 
     </LinearLayout>
 
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:id="@+id/imgView" />
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.32"
+        android:background="#000000">
+
+        <VideoView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imgView"
+            android:layout_gravity="center_horizontal" />
+    </FrameLayout>
 
     <Button
         android:layout_width="match_parent"

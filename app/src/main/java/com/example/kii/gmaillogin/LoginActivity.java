@@ -79,6 +79,7 @@ public class LoginActivity extends Activity {
     public InputStream finalStream;
     public static TextView progress;
     public static ProgressDialog progressDialog;
+    public static String mEmail;
 
 
 
@@ -238,7 +239,7 @@ public class LoginActivity extends Activity {
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
-    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
+     // Received from newChooseAccountIntent(); passed to getToken()
     String mType;
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -350,7 +351,7 @@ public class LoginActivity extends Activity {
 //    public File createNewFile(){
 //        File file = new File(getFilesDir(), "dataStore");
 //        return file;
-//    }
+//
 
     public void checkAPI() throws IOException, JSONException {
 
