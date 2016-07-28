@@ -5,6 +5,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
+    tools:context=".MainActivity"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@drawable/bg">
 
@@ -103,6 +104,27 @@
             android:layout_alignEnd="@+id/view3"
             android:background="#0080ff"
             android:textColor="#ffffff" />
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.32"
+            android:background="#000000">
+
+            <VideoView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/imgView"
+                android:layout_gravity="center_horizontal"
+                android:background="#80000000" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressTV"
+            android:layout_gravity="center_horizontal" />
 
     </RelativeLayout>
 

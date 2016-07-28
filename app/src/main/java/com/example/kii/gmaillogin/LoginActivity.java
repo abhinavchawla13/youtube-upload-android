@@ -80,7 +80,7 @@ public class LoginActivity extends Activity {
     public static TextView progress;
     public static ProgressDialog progressDialog;
     public static String mEmail;
-
+    public ImageView videoCheck;
 
 
     //Send button
@@ -93,7 +93,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_email);
+        setContentView(R.layout.activity_login);
 
         //network
 
@@ -114,11 +114,12 @@ public class LoginActivity extends Activity {
         editTextSubject = (EditText) findViewById(R.id.editTextSubject);
         editTextMessage = (EditText) findViewById(R.id.editTextMessage);
         camButton = (Button) findViewById(R.id.rVideoButton);
-        imgView = (VideoView) findViewById(R.id.imgView);
+//        imgView = (VideoView) findViewById(R.id.imgView);
         createVideo = (Button) findViewById(R.id.createVideoButton);
+        videoCheck = (ImageView) findViewById(R.id.videoTick);
 
 //        buttonSend = (Button) findViewById(R.id.buttonSend);
-        requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 3423);
+//        requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 3423);
 
 
         progress = (TextView) findViewById(R.id.progressTV);
@@ -277,8 +278,9 @@ public class LoginActivity extends Activity {
                 e.printStackTrace();
                 Log.d("hello", "here");
             }
-            imgView.setVideoURI(videoUri);
-            imgView.start();
+            videoCheck.setAlpha((float) 1);
+//            imgView.setVideoURI(videoUri);
+//            imgView.start();
 
 //            Cursor videoCursor =
 //                    getContentResolver().query(videoUri, null, null, null, null);

@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.vision.text.Text;
@@ -224,9 +225,11 @@ public class UploadVideo {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 public void run() {
                                     // code goes here
-                                    LoginActivity.progress.setText("Upload finished! Sit back, and relax while email is being sent.");
+                                    Toast t = Toast.makeText(context, "Upload Successfull! Sit back and Relax while email is being sent!", Toast.LENGTH_LONG);
+//                                    LoginActivity.progress.setText("Upload finished! Sit back, and relax while email is being sent.");
                                     LoginActivity.progressDialog.setProgress(100);
                                     LoginActivity.progressDialog.dismiss();
+                                    t.show();
                                 }
                             });
                             break;
@@ -263,7 +266,7 @@ public class UploadVideo {
 
     public static void checkAPI(String id) throws IOException, JSONException {
 
-        String url = "http://10.0.1.8:8080/api/youtube-tester";
+        String url = "http://192.168.0.14:8080/api/youtube-tester";
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
