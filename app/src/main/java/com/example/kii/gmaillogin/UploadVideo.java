@@ -263,7 +263,7 @@ public class UploadVideo {
 
     public static void checkAPI(String id) throws IOException, JSONException {
 
-        String url = "http://192.168.0.14:8080/api/youtube-tester";
+        String url = "http://10.0.1.8:8080/api/youtube-tester";
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
